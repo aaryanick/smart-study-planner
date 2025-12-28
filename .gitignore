@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+users.csv
+study_plans.csv
+.env 

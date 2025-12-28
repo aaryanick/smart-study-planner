@@ -2,16 +2,16 @@ import streamlit as st
 import pandas as pd
 import os
 
+# ---------------- CONFIG ----------------
 st.set_page_config(page_title="Smart Study Planner", layout="centered")
 
-# ---------------- STYLING ----------------
 st.markdown("""
 <style>
 body { background-color: #0e1117; color: white; }
 .stButton>button {
     background-color: #4CAF50;
     color: white;
-    border-radius: 10px;
+    border-radius: 8px;
     width: 100%;
 }
 </style>
@@ -27,7 +27,7 @@ if not os.path.exists(USER_FILE):
 if not os.path.exists(PLAN_FILE):
     pd.DataFrame(columns=["username", "subject", "hours"]).to_csv(PLAN_FILE, index=False)
 
-# ---------------- FUNCTIONS ----------------
+# ---------------- AUTH FUNCTIONS ----------------
 def register_user(username, password):
     df = pd.read_csv(USER_FILE)
     if username in df["username"].values:
@@ -40,24 +40,25 @@ def login_user(username, password):
     df = pd.read_csv(USER_FILE)
     return not df[(df["username"] == username) & (df["password"] == password)].empty
 
-
 # ---------------- UI ----------------
 st.title("📘 Smart Study Planner")
 
-tab1, tab2 = st.tabs(["🔐 Login", "📝 Sign Up"])
+tabs = st.tabs(["🔐 Login", "📝 Sign Up", "👤 Profile"])
 
-with tab2:
+# -------- SIGN UP --------
+with tabs[1]:
     st.subheader("Create Account")
     r_user = st.text_input("Username", key="ruser")
     r_pass = st.text_input("Password", type="password", key="rpass")
 
     if st.button("Sign Up"):
         if register_user(r_user, r_pass):
-            st.success("Account created! Now login 👇")
+            st.success("Account created! Now login.")
         else:
             st.error("Username already exists!")
 
-with tab1:
+# -------- LOGIN --------
+with tabs[0]:
     st.subheader("Login")
     l_user = st.text_input("Username", key="luser")
     l_pass = st.text_input("Password", type="password", key="lpass")
@@ -69,8 +70,35 @@ with tab1:
         else:
             st.error("Invalid credentials")
 
+# -------- PROFILE --------
+with tabs[2]:
+    if "user" not in st.session_state:
+        st.warning("Please login first.")
+    else:
+        user = st.session_state["user"]
+        st.subheader(f"👤 Welcome, {user}")
 
-# ---------------- MAIN APP ----------------
+        plans = pd.read_csv(PLAN_FILE)
+        user_plans = plans[plans["username"] == user]
+
+        total_hours = user_plans["hours"].sum() if not user_plans.empty else 0
+        subjects_count = user_plans["subject"].nunique()
+
+        col1, col2 = st.columns(2)
+        col1.metric("Total Study Hours", f"{total_hours:.1f}")
+        col2.metric("Subjects Studied", subjects_count)
+
+        st.subheader("📘 Your Study History")
+        if user_plans.empty:
+            st.info("No study plans yet.")
+        else:
+            st.dataframe(user_plans)
+
+        if st.button("Logout"):
+            st.session_state.clear()
+            st.experimental_rerun()
+
+# ---------------- STUDY PLANNER ----------------
 if "user" in st.session_state:
     st.divider()
     st.header("📚 Study Planner")
@@ -87,7 +115,7 @@ if "user" in st.session_state:
         with c3:
             urg = st.slider("Urgency", 1, 5, 3, key=f"u{i}")
 
-        weight = {"Easy":1, "Medium":2, "Hard":3}[diff]
+        weight = {"Easy": 1, "Medium": 2, "Hard": 3}[diff]
         subjects.append([name, weight * urg])
 
     hours = st.slider("Total Study Hours", 1, 12, 6)
@@ -96,7 +124,7 @@ if "user" in st.session_state:
         df = pd.DataFrame(subjects, columns=["Subject", "Score"])
         df["Study Hours"] = (df["Score"] / df["Score"].sum()).round(2) * hours
 
-        st.success("Study Plan Created!")
+        st.success("Study Plan Generated 🎯")
         st.dataframe(df)
 
         for _, row in df.iterrows():
@@ -105,11 +133,3 @@ if "user" in st.session_state:
                 "subject": row["Subject"],
                 "hours": row["Study Hours"]
             }]).to_csv(PLAN_FILE, mode="a", header=False, index=False)
-
-    st.subheader("📂 Saved Plans")
-    plans = pd.read_csv(PLAN_FILE)
-    st.dataframe(plans[plans["username"] == st.session_state["user"]])
-
-    if st.button("Logout"):
-        st.session_state.clear()
-        st.experimental_rerun()

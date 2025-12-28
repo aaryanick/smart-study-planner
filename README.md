@@ -1,41 +1,39 @@
 # 📘 Smart Study Planner
 
-A web-based smart study planner built using Python and Streamlit.
+A web-based smart study planner built using **Python** and **Streamlit** that helps students manage their study time efficiently.
+
+---
 
 ## 🚀 Features
-- Login & Signup system
-- Smart study time calculation
-- Saves study plans
-- Profile page with history
-- Clean dark UI
+
+- 🔐 User Authentication (Login & Signup)
+- 👤 Profile Page with study statistics
+- 📊 Smart study time calculation
+- 💾 Saves user study history
+- 🌙 Clean dark UI
+- 📈 Dynamic charts and tables
+
+---
+
+## 🧠 How It Works
+
+1. User signs up / logs in  
+2. Enters number of subjects  
+3. Sets difficulty & urgency  
+4. App calculates optimal study time  
+5. Study plan is saved and visible in profile  
+
+---
 
 ## 🛠️ Tech Stack
-- Python
-- Streamlit
-- Pandas
 
-## ▶️ How to Run
+- Python  
+- Streamlit  
+- Pandas  
+- Git & GitHub  
 
-1. Install dependencies:
-   pip install streamlit pandas
+---
 
-2. Run the app:
-   python -m streamlit run app.py
+## ▶️ How to Run Locally
 
-3. Open browser:
-   http://localhost:8501
-
-## 📂 Project Structure
-smart-study-planner/
-│
-├── app.py
-├── .gitignore
-├── README.md
-├── users.csv (auto created)
-└── study_plans.csv (auto created)
-
-## 👤 Author
-Aaryan
-
-## ⭐ Note
-This project was built as a learning and portfolio project.
+### 1. Install dependencies
